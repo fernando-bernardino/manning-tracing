@@ -13,12 +13,18 @@
 	<name>tracing</name>
 	<description>Instrument Tracing inside a Single Microservice</description>
 	<properties>
+		<start-class>bernardino.manning.tracing.TracingApplication</start-class>
 		<java.version>11</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.jaegertracing</groupId>
+			<artifactId>jaeger-client</artifactId>
+			<version>1.6.0</version>
 		</dependency>
 
 		<dependency>
