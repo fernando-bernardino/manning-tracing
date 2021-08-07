@@ -1,6 +1,7 @@
 package bernardino.manning.tracing.logistics;
 
 import io.jaegertracing.internal.JaegerTracer;
+import io.opentracing.Scope;
 import io.opentracing.Span;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +17,14 @@ public class DeliveryService {
         this.tracer = jaegerTracer;
     }
 
-    public void arrangeDelivery(Span span) {
-        Span child = tracer.buildSpan("arrangeDelivery").asChildOf(span).start();
-        try {
-            logisticsService.transport(child);
+    public void arrangeDelivery() {
+        Span span = tracer.buildSpan("arrangeDelivery").start();
+        try (Scope scope = tracer.scopeManager().activate(span)) {
+            logisticsService.transport();
 
-            child.log("done arranging delivery");
+            span.log("done arranging delivery");
         } finally {
-            child.finish();
+            span.finish();
         }
     }
 }
