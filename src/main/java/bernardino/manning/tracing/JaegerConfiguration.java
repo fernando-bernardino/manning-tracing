@@ -2,7 +2,7 @@ package bernardino.manning.tracing;
 
 import io.jaegertracing.Configuration.ReporterConfiguration;
 import io.jaegertracing.Configuration.SamplerConfiguration;
-import io.opentracing.Tracer;
+import io.jaegertracing.internal.JaegerTracer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class JaegerConfiguration {
 
     @Bean
-    public Tracer jaegerTracer() {
+    public JaegerTracer jaegerTracer() {
         SamplerConfiguration samplerConfig = SamplerConfiguration.fromEnv().withType("const").withParam(1);
         ReporterConfiguration reporterConfig = ReporterConfiguration.fromEnv().withLogSpans(true);
         io.jaegertracing.Configuration config = new io.jaegertracing

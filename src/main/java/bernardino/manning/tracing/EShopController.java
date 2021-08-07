@@ -1,37 +1,59 @@
 package bernardino.manning.tracing;
 
 
+import bernardino.manning.tracing.billing.BillingService;
+import bernardino.manning.tracing.inventory.InventoryService;
+import bernardino.manning.tracing.logistics.DeliveryService;
+import io.jaegertracing.internal.JaegerTracer;
+import io.opentracing.Scope;
 import io.opentracing.Span;
-import io.opentracing.Tracer;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.opentracing.log.Fields;
+import io.opentracing.tag.Tags;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 @RestController
 @RequestMapping
 public class EShopController {
 
-    private final Tracer tracer;
+    private final JaegerTracer tracer;
 
-    @Autowired
-    public EShopController(Tracer tracer) {
+    private final InventoryService inventoryService;
+
+    private final BillingService billingService;
+
+    private final DeliveryService deliveryService;
+
+    public EShopController(JaegerTracer tracer,
+                           InventoryService inventoryService,
+                           BillingService billingService,
+                           DeliveryService deliveryService) {
         this.tracer = tracer;
+        this.inventoryService = inventoryService;
+        this.billingService = billingService;
+        this.deliveryService = deliveryService;
     }
 
     @PostMapping(value = "/checkout")
     public ResponseEntity<String> checkout() {
-        return trace(() -> ResponseEntity.ok("You have successfully checked out your shopping cart."),
-                "checkout");
-    }
-
-    private <M> M trace(Supplier<M> toTrace, String method) {
-        Span span = tracer.buildSpan(method).start();
+        Span span = tracer.buildSpan("checkout").start();
         try {
-            return toTrace.get();
+            inventoryService.createOrder(span);
+            billingService.payment(span);
+            deliveryService.arrangeDelivery(span);
+
+            return ResponseEntity.ok("You have successfully checked out your shopping cart.");
+        } catch(Exception ex) {
+            Tags.ERROR.set(span, true);
+            span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));
+
+            return ResponseEntity.internalServerError()
+                    .body("Something went wrong, please contact our customer service.");
         } finally {
             span.finish();
         }
