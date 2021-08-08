@@ -1,6 +1,7 @@
 package bernardino.manning.tracing.billing;
 
 import io.jaegertracing.internal.JaegerTracer;
+import io.opentracing.Scope;
 import io.opentracing.Span;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,13 @@ public class BillingService {
         this.tracer = tracer;
     }
 
-    public void payment(Span span) {
-        Span child = tracer.buildSpan("payment").asChildOf(span).start();
-        try {
+    public void payment() {
+        Span span = tracer.buildSpan("payment").start();
+        try (Scope scope = tracer.scopeManager().activate(span)) {
             //  do something ...
-            child.log("payment done");
+            span.log("payment done");
         } finally {
-            child.finish();
+            span.finish();
         }
     }
 }

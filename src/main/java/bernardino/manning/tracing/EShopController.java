@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 @RestController
 @RequestMapping
@@ -42,10 +41,10 @@ public class EShopController {
     @PostMapping(value = "/checkout")
     public ResponseEntity<String> checkout() {
         Span span = tracer.buildSpan("checkout").start();
-        try {
-            inventoryService.createOrder(span);
-            billingService.payment(span);
-            deliveryService.arrangeDelivery(span);
+        try (Scope scope = tracer.scopeManager().activate(span)){
+            inventoryService.createOrder();
+            billingService.payment();
+            deliveryService.arrangeDelivery();
 
             return ResponseEntity.ok("You have successfully checked out your shopping cart.");
         } catch(Exception ex) {

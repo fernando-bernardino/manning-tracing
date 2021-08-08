@@ -1,6 +1,7 @@
 package bernardino.manning.tracing.inventory;
 
 import io.jaegertracing.internal.JaegerTracer;
+import io.opentracing.Scope;
 import io.opentracing.Span;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +14,13 @@ public class InventoryService {
         this.tracer = tracer;
     }
 
-    public void createOrder(Span span) {
-        Span child = tracer.buildSpan("createOrder")
-                .asChildOf(span)
-                .start();
-        try {
+    public void createOrder() {
+        Span span = tracer.buildSpan("createOrder").start();
+        try (Scope scope = tracer.scopeManager().activate(span)) {
             //  do something ...
-            child.log("done creating order");
+            span.log("done creating order");
         } finally {
-            child.finish();
+            span.finish();
         }
     }
 }
