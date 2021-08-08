@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: manning-tracing
+
+billing.url: http://billing:8080/
+delivery.url: http://delivery:8080/
+inventory.url: http://inventory:8080/
+logistics.url: http://logistics:8080/
+
+---
+spring:
+  profiles:
+     development
+
+billing.url: http://localhost:8080/
+delivery.url: http://localhost:8080/
+inventory.url: http://localhost:8080/
+logistics.url: http://localhost:8080/
