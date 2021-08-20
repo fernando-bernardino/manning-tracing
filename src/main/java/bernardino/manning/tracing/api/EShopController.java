@@ -1,9 +1,9 @@
-package bernardino.manning.tracing;
+package bernardino.manning.tracing.api;
 
 
-import bernardino.manning.tracing.billing.BillingService;
-import bernardino.manning.tracing.inventory.InventoryService;
-import bernardino.manning.tracing.logistics.DeliveryService;
+import bernardino.manning.tracing.client.BillingClient;
+import bernardino.manning.tracing.client.DeliveryClient;
+import bernardino.manning.tracing.client.InventoryClient;
 import io.jaegertracing.internal.JaegerTracer;
 import io.opentracing.Scope;
 import io.opentracing.Span;
@@ -21,30 +21,29 @@ import java.util.Map;
 public class EShopController {
 
     private final JaegerTracer tracer;
+    private final BillingClient billingClient;
+    private final InventoryClient inventoryClient;
+    private final DeliveryClient deliveryClient;
 
-    private final InventoryService inventoryService;
-
-    private final BillingService billingService;
-
-    private final DeliveryService deliveryService;
-
-    public EShopController(JaegerTracer tracer,
-                           InventoryService inventoryService,
-                           BillingService billingService,
-                           DeliveryService deliveryService) {
+    public EShopController(
+            JaegerTracer tracer,
+            BillingClient billingClient,
+            InventoryClient inventoryClient,
+            DeliveryClient deliveryClient) {
         this.tracer = tracer;
-        this.inventoryService = inventoryService;
-        this.billingService = billingService;
-        this.deliveryService = deliveryService;
+        this.billingClient = billingClient;
+        this.inventoryClient = inventoryClient;
+        this.deliveryClient = deliveryClient;
     }
 
     @PostMapping(value = "/checkout")
     public ResponseEntity<String> checkout() {
         Span span = tracer.buildSpan("checkout").start();
         try (Scope scope = tracer.scopeManager().activate(span)){
-            inventoryService.createOrder();
-            billingService.payment();
-            deliveryService.arrangeDelivery();
+
+            billingClient.doPayment();
+            inventoryClient.createOrder();
+            deliveryClient.arrangeDelivery();
 
             return ResponseEntity.ok("You have successfully checked out your shopping cart.");
         } catch(Exception ex) {
