@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: eshop
+    spec:
+      selector:
+        matchLabels:
+          run: eshop
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            run: eshop
+        spec:
+          containers:
+            - name: eshop
+              image: fbernardino/tracing:2.0
+              ports:
+                - containerPort: 8080
+              env:
+                - name: JAEGER_AGENT_HOST
+                  value: jaeger-agent
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: eshop
+      labels:
+        run: eshop
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+      selector:
+        run: eshop
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: billing
+    spec:
+      selector:
+        matchLabels:
+          run: billing
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            run: billing
+        spec:
+          containers:
+            - name: billing
+              image: fbernardino/tracing:2.0
+              ports:
+                - containerPort: 8080
+              env:
+                - name: JAEGER_AGENT_HOST
+                  value: jaeger-agent
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: billing
+      labels:
+        run: billing
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+      selector:
+        run: billing
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: delivery
+    spec:
+      selector:
+        matchLabels:
+          run: delivery
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            run: delivery
+        spec:
+          containers:
+            - name: delivery
+              image: fbernardino/tracing:2.0
+              ports:
+                - containerPort: 8080
+              env:
+                - name: JAEGER_AGENT_HOST
+                  value: jaeger-agent
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: delivery
+      labels:
+        run: delivery
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+      selector:
+        run: delivery
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: inventory
+    spec:
+      selector:
+        matchLabels:
+          run: inventory
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            run: inventory
+        spec:
+          containers:
+            - name: inventory
+              image: fbernardino/tracing:2.0
+              ports:
+                - containerPort: 8080
+              env:
+                - name: JAEGER_AGENT_HOST
+                  value: jaeger-agent
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: inventory
+      labels:
+        run: inventory
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+      selector:
+        run: inventory
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: logistics
+    spec:
+      selector:
+        matchLabels:
+          run: logistics
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            run: logistics
+        spec:
+          containers:
+            - name: logistics
+              image: fbernardino/tracing:2.0
+              ports:
+                - containerPort: 8080
+              env:
+                - name: JAEGER_AGENT_HOST
+                  value: jaeger-agent
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: logistics
+      labels:
+        run: logistics
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+      selector:
+        run: logistics
