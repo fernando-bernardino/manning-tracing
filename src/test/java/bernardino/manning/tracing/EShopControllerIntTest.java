@@ -14,7 +14,6 @@ class EShopControllerIntTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
     public void checkoutIsMadeWithSuccess() throws Exception {
         mockMvc.perform(post("/checkout"))
                 .andExpect(status().isOk());
