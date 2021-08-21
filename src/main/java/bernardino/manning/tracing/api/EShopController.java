@@ -39,13 +39,14 @@ public class EShopController {
     @PostMapping(value = "/checkout")
     public ResponseEntity<String> checkout() {
         Span span = tracer.buildSpan("checkout").start();
+        span.setBaggageItem("user", "tony");
         try (Scope scope = tracer.scopeManager().activate(span)){
 
             billingClient.doPayment();
             inventoryClient.createOrder();
             deliveryClient.arrangeDelivery();
 
-            return ResponseEntity.ok("You have successfully checked out your shopping cart.");
+            return ResponseEntity.ok("You have successfully checked out your shopping cart tony");
         } catch(Exception ex) {
             Tags.ERROR.set(span, true);
             span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));

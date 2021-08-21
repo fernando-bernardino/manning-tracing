@@ -29,7 +29,7 @@ public class InventoryController {
     public ResponseEntity<?> arrangeDelivery(@RequestHeader Map<String, String> headers) {
         Span span = extractor.createSpan("inventory", headers);
         try (Scope scope = tracer.scopeManager().activate(span)){
-            return ResponseEntity.ok("Order was created.");
+            return ResponseEntity.ok("Order was created for " + headers.get("uberctx-user"));
         } catch(Exception ex) {
             Tags.ERROR.set(span, true);
             span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));

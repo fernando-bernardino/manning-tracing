@@ -34,7 +34,7 @@ public class DeliveryController {
         try (Scope scope = tracer.scopeManager().activate(span)){
             logisticClient.transport();
 
-            return ResponseEntity.ok("Delivery was arranged.");
+            return ResponseEntity.ok("Delivery was arranged for " + headers.get("uberctx-user"));
         } catch(Exception ex) {
             Tags.ERROR.set(span, true);
             span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));

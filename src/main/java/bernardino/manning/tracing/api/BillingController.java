@@ -29,7 +29,7 @@ public class BillingController {
     public ResponseEntity<?> doPayment(@RequestHeader Map<String, String> headers) {
         Span span = extractor.createSpan("billing", headers);
         try (Scope scope = tracer.scopeManager().activate(span)){
-            return ResponseEntity.ok("You have successfully payed your order.");
+            return ResponseEntity.ok("You have successfully payed your order for " + headers.get("uberctx-user"));
         } catch(Exception ex) {
             Tags.ERROR.set(span, true);
             span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));
