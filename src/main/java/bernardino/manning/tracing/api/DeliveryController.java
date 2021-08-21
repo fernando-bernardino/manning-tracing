@@ -8,6 +8,7 @@ import io.opentracing.log.Fields;
 import io.opentracing.tag.Tags;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,16 +19,18 @@ import java.util.Map;
 public class DeliveryController {
 
     private final JaegerTracer tracer;
+    private final JaegerContextExtractor extractor;
     private final LogisticClient logisticClient;
 
-    public DeliveryController(JaegerTracer jaegerTracer, LogisticClient logisticClient) {
+    public DeliveryController(JaegerTracer jaegerTracer, JaegerContextExtractor extractor, LogisticClient logisticClient) {
         this.tracer = jaegerTracer;
+        this.extractor = extractor;
         this.logisticClient = logisticClient;
     }
 
     @PostMapping
-    public ResponseEntity<?> arrangeDelivery() {
-        Span span = tracer.buildSpan("delivery").start();
+    public ResponseEntity<?> arrangeDelivery(@RequestHeader Map<String, String> headers) {
+        Span span = extractor.createSpan("delivery", headers);
         try (Scope scope = tracer.scopeManager().activate(span)){
             logisticClient.transport();
 
