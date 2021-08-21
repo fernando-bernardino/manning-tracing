@@ -29,7 +29,7 @@ public class LogisticController {
     public ResponseEntity<?> arrangeDelivery(@RequestHeader Map<String, String> headers) {
         Span span = extractor.createSpan("transport", headers);
         try (Scope scope = tracer.scopeManager().activate(span)){
-            return ResponseEntity.ok("Transport was arranged");
+            return ResponseEntity.ok("Transport was arranged for " + headers.get("uberctx-user"));
         } catch(Exception ex) {
             Tags.ERROR.set(span, true);
             span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));
