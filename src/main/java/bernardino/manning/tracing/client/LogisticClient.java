@@ -28,7 +28,7 @@ public class LogisticClient {
         ResponseEntity<?> response = restTemplate.postForEntity(paymentUri, null, Void.class);
 
         if(!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException(format("Called failed: code {}, body {}",
+            throw new RuntimeException(format("Called failed: code %d, body %s",
                     response.getStatusCodeValue(), response.getBody()));
         }
     }
