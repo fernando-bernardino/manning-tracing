@@ -1,0 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: eshop-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "eshop.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eshop
+spec:
+  hosts:
+    - "eshop.com"
+  gateways:
+    - default/eshop-gateway
+  http:
+  - route:
+    - destination:
+        host: eshop
+        port:
+          number: 8080
