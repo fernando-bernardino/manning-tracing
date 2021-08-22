@@ -3,6 +3,7 @@ package bernardino.manning.tracing.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,11 +13,11 @@ import static java.lang.String.format;
 @Component
 public class LogisticClient {
 
-    private final JaegerAwareRestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     private URI baseUri;
 
-    public LogisticClient(JaegerAwareRestTemplate restTemplate, @Value("${logistics.url:http://logistics:8080/}") String baseUrl)
+    public LogisticClient(RestTemplate restTemplate, @Value("${logistics.url:http://logistics:8080/}") String baseUrl)
             throws URISyntaxException {
         this.restTemplate = restTemplate;
         this.baseUri = new URI(baseUrl);

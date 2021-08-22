@@ -17,32 +17,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/arrangeDelivery")
 public class DeliveryController {
-
-    private final JaegerTracer tracer;
-    private final JaegerContextExtractor extractor;
     private final LogisticClient logisticClient;
 
-    public DeliveryController(JaegerTracer jaegerTracer, JaegerContextExtractor extractor, LogisticClient logisticClient) {
-        this.tracer = jaegerTracer;
-        this.extractor = extractor;
+    public DeliveryController(LogisticClient logisticClient) {
         this.logisticClient = logisticClient;
     }
 
     @PostMapping
     public ResponseEntity<?> arrangeDelivery(@RequestHeader Map<String, String> headers) {
-        Span span = extractor.createSpan("delivery", headers);
-        try (Scope scope = tracer.scopeManager().activate(span)){
+        try {
             logisticClient.transport();
 
             return ResponseEntity.ok("Delivery was arranged.");
         } catch(Exception ex) {
-            Tags.ERROR.set(span, true);
-            span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));
-
             return ResponseEntity.internalServerError()
                     .body("Something went wrong, please contact our customer service.");
-        } finally {
-            span.finish();
         }
     }
 }
